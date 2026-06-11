@@ -39,6 +39,8 @@ class Client extends Authenticatable
         'blocked_at' => 'datetime',
     ];
 
+    
+
     // Методы для блокировки
     public function block($reason = null, $blockedBy = null)
     {
