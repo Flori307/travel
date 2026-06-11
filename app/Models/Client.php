@@ -94,4 +94,19 @@ class Client extends Authenticatable
             'admin' => 'Администратор'
         ][$this->role] ?? 'Пользователь';
     }
+
+    public function getAuthIdentifierName()
+{
+    return 'client_id';
+}
+
+public function getAuthIdentifier()
+{
+    return $this->client_id;
+}
+
+public function getRememberTokenName()
+{
+    return 'remember_token';
+}
 }
