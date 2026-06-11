@@ -59,22 +59,33 @@ class AuthController extends Controller
     }
 
     public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+{
+    $credentials = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|string',
+    ]);
 
-        if (Auth::attempt($credentials, $request->filled('remember'))) {
-            $request->session()->regenerate();
-            return redirect()->intended(route('home'))
-                ->with('success', 'Добро пожаловать!');
-        }
-
-        return back()->withErrors([
-            'email' => 'Неверный email или пароль.',
-        ])->onlyInput('email');
+    // ОТЛАДКА 1: Проверяем, находит ли пользователя
+    $client = Client::where('email', $credentials['email'])->first();
+    \Log::info('Пользователь найден:', ['id' => $client->client_id ?? 'не найден', 'email' => $credentials['email']]);
+    
+    if (Auth::attempt($credentials, $request->filled('remember'))) {
+        // ОТЛАДКА 2: Проверяем, авторизовался ли
+        \Log::info('Auth::attempt успешен, пользователь авторизован:', ['id' => Auth::id()]);
+        $request->session()->regenerate();
+        
+        // ОТЛАДКА 3: Проверяем сессию
+        \Log::info('ID сессии после регенерации:', ['session_id' => session()->getId()]);
+        
+        return redirect()->intended(route('home'))
+            ->with('success', 'Добро пожаловать!');
     }
+
+    \Log::info('Auth::attempt НЕ успешен');
+    return back()->withErrors([
+        'email' => 'Неверный email или пароль.',
+    ])->onlyInput('email');
+}
 
     public function logout(Request $request)
     {
