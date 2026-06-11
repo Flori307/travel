@@ -1,5 +1,5 @@
 <?php
-// app/Models/Client.php - добавьте эти методы
+// app/Models/Client.php
 
 namespace App\Models;
 
@@ -12,6 +12,12 @@ class Client extends Authenticatable
     
     protected $primaryKey = 'client_id';
     public $timestamps = true;
+
+    // ЭТОТ МЕТОД КРИТИЧЕСКИ ВАЖЕН ДЛЯ АВТОРИЗАЦИИ
+    public function getAuthIdentifierName()
+    {
+        return 'client_id';
+    }
 
     protected $fillable = [
         'first_name',
@@ -38,8 +44,6 @@ class Client extends Authenticatable
         'is_blocked' => 'boolean',
         'blocked_at' => 'datetime',
     ];
-
-    
 
     // Методы для блокировки
     public function block($reason = null, $blockedBy = null)
@@ -70,17 +74,17 @@ class Client extends Authenticatable
     // Отношения
     public function bookings()
     {
-        return $this->hasMany(Booking::class, 'client_id');
+        return $this->hasMany(Booking::class, 'client_id', 'client_id');
     }
 
     public function reviews()
     {
-        return $this->hasMany(Review::class, 'client_id');
+        return $this->hasMany(Review::class, 'client_id', 'client_id');
     }
 
     public function blockedByUser()
     {
-        return $this->belongsTo(Client::class, 'blocked_by');
+        return $this->belongsTo(Client::class, 'blocked_by', 'client_id');
     }
 
     public function getFullNameAttribute(): string
